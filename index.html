@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แปลงข้อความ จัดกลุ่ม คน งาน เวลา</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2333;--mut:#6b7488;--bd:#dfe4ee;--pri:#2563eb;--prib:#e6eeff;--crit:#dc2626;--maj:#ea7a0c;--min:#ca9a04;--non:#2563eb;--ok:#16a34a;--warn:#fff4d6;--warnt:#8a5a00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141d;--card:#1a2030;--tx:#e8ecf5;--mut:#98a2b8;--bd:#2b3347;--pri:#6b9bff;--prib:#22304f;--warn:#3a2f10;--warnt:#f0c25a}}
+:root[data-theme="dark"]{--bg:#10141d;--card:#1a2030;--tx:#e8ecf5;--mut:#98a2b8;--bd:#2b3347;--pri:#6b9bff;--prib:#22304f;--warn:#3a2f10;--warnt:#f0c25a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Sarabun","Noto Sans Thai",system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:16px}
+h1{font-size:1.3rem;margin:4px 0 2px}
+.sub{color:var(--mut);font-size:.88rem;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+summary{cursor:pointer;font-weight:600}
+textarea{width:100%;min-height:130px;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:.9rem;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+button,select,input[type=search]{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:7px 12px;font:inherit;font-size:.86rem}
+button{cursor:pointer}
+button.on{background:var(--pri);border-color:var(--pri);color:#fff}
+input[type=search]{flex:1;min-width:170px}
+.bar2{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;margin-top:6px}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:6px 12px;cursor:pointer}
+.stat b{display:block;font-size:1.35rem;color:var(--pri)}
+.stat.r b{color:var(--crit)}.stat.y b{color:var(--maj)}
+.stat span{color:var(--mut);font-size:.78rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:8px}
+.g{background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.gh{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 14px;background:var(--prib);font-weight:600}
+.cnt{background:var(--pri);color:#fff;border-radius:99px;padding:0 9px;font-size:.78rem}
+.it{padding:9px 14px;border-top:1px solid var(--bd);font-size:.9rem}
+.it small{display:block;color:var(--mut)}
+.tag{display:inline-block;border-radius:6px;padding:0 7px;font-size:.74rem;color:#fff;margin-left:4px;vertical-align:middle}
+.Critical{background:var(--crit)}.Major{background:var(--maj)}.Minor{background:var(--min)}.None{background:var(--non)}.auto{background:var(--mut)}
+.jc{border-left:5px solid var(--non)}
+.jc.Critical{border-left-color:var(--crit)}.jc.Major{border-left-color:var(--maj)}.jc.Minor{border-left-color:var(--min)}
+.jh{padding:10px 14px 4px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.jh b{font-size:1rem}
+.f{display:grid;grid-template-columns:105px 1fr;gap:2px 10px;padding:4px 14px 8px;font-size:.88rem;margin:0}
+.f dt{color:var(--mut)}.f dd{margin:0;word-break:break-word}
+.chip{display:inline-block;background:var(--prib);color:var(--pri);border-radius:99px;padding:0 10px;margin:1px 3px 1px 0;font-size:.82rem}
+a{color:var(--pri)}
+.late{color:var(--crit);font-weight:600}.soon{color:var(--maj);font-weight:600}.left{color:var(--ok);font-weight:600}
+.pb{height:6px;background:var(--bd);border-radius:99px;margin:2px 14px 8px;overflow:hidden}
+.pb i{display:block;height:100%;background:var(--ok)}.pb i.soon{background:var(--maj)}.pb i.late{background:var(--crit)}
+.warn{background:var(--warn);color:var(--warnt);border-radius:8px;padding:5px 10px;margin:0 14px 8px;font-size:.82rem}
+.ft{display:flex;gap:6px;padding:0 14px 10px;flex-wrap:wrap}
+.ft button{font-size:.78rem;padding:3px 10px}
+details.raw{padding:0 14px 10px;font-size:.82rem;color:var(--mut)}
+details.raw summary{font-weight:400}
+pre{white-space:pre-wrap;margin:6px 0 0;font:inherit;background:var(--bg);padding:8px;border-radius:8px}
+.hint{color:var(--mut);font-size:.82rem}
+.empty{text-align:center;color:var(--mut);padding:30px}
+.mini{padding:2px 9px;font-size:.8rem;border-radius:8px}
+.mini.tk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.ir{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ic{min-width:0}.ia{display:flex;gap:5px;flex-shrink:0}
+.it.prog{background:rgba(22,163,74,.09)}
+.g.prog{box-shadow:inset 0 0 0 2px var(--ok)}
+.rmt{margin-top:4px;font-size:.82rem;background:var(--bg);border-radius:8px;padding:3px 8px;white-space:pre-wrap}
+.it input[type=text],.rmc textarea{width:100%;margin-top:6px;border:1px solid var(--bd);border-radius:8px;padding:6px 8px;background:var(--bg);color:var(--tx);font:inherit;font-size:.85rem}
+.rmc{padding:0 14px 8px}.rmc textarea{margin-top:0;min-height:0}
+.stat.k b{color:var(--ok)}
+.tag.st{background:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🗂️ แปลงข้อความ → จัดกลุ่ม คน / งาน / เวลา</h1>
+<div class="sub">วางข้อความ (หลายตั๋วพร้อมกันได้) ระบบแปลงอัตโนมัติ แยกรายละเอียด ตรวจเวลา และเตือนทีมซ้อนงาน</div>
+
+<details class="card" id="inbox" open>
+<summary>📥 ข้อความที่วาง <span id="mode" class="hint"></span></summary>
+<textarea id="in" placeholder="วางข้อความตั๋วงาน (JB26-...) หรือตารางเวรจาก Excel ที่นี่"></textarea>
+<div class="row">
+<button id="ex1">ตัวอย่างตั๋วงาน</button>
+<button id="ex2">ตัวอย่างตารางเวร</button>
+<button id="clr">ล้าง</button>
+<span class="hint">ข้อความล่าสุดถูกจำไว้ในเครื่องนี้ให้อัตโนมัติ</span>
+</div>
+</details>
+
+<div class="stats" id="stats"></div>
+
+<div class="bar2">
+<div class="row" style="margin-top:0">
+<button data-v="job" class="on">🛠️ ตามงาน</button>
+<button data-v="assign">🧑‍💼 ตาม Assign To</button>
+<button data-v="team">👥 ตามทีมช่าง</button>
+<button data-v="time">🕒 ตามเวลา</button>
+</div>
+<div class="row">
+<input type="search" id="q" placeholder="🔍 ค้นหา เลข JB, ชื่อ, ทีม, ไซต์, รายละเอียด">
+<select id="fpri"><option value="">ระดับงานทั้งหมด</option><option>Critical</option><option>Major</option><option>Minor</option><option>None</option></select>
+<select id="fst"><option value="">ทุกสถานะเวลา</option><option value="late">เกินกำหนด</option><option value="soon">ใกล้ครบ (≤ 1 ชม.)</option><option value="ok">ปกติ</option></select>
+<select id="fpg"><option value="">ทุกงาน</option><option value="on">✓ กำลังดำเนินการ</option><option value="off">ยังไม่ดำเนินการ</option></select>
+<select id="fprov"><option value="">ทุกจังหวัด</option></select>
+<select id="fas"><option value="">ทุก Assign To</option></select>
+<select id="fsort"><option value="end">เรียง: เวลาครบกำหนด</option><option value="pri">เรียง: ระดับงาน</option><option value="job">เรียง: เลข JB</option></select>
+</div>
+<div class="row">
+<button id="cpall">📋 คัดลอกสรุปทั้งหมด</button>
+<button id="cptab">📊 คัดลอกเป็นตาราง (วางใน Excel)</button>
+<button id="rst">รีเซ็ตตัวกรอง</button>
+<span class="hint" id="shown"></span>
+</div>
+</div>
+
+<div id="out" class="grid"></div>
+</div>
+
+<script>
+const SLA={None:720,Minor:72,Major:10,Critical:3},RANK={Critical:0,Major:1,Minor:2,None:3,"":4};
+const MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+const PROV={PTN:"ปัตตานี",YLA:"ยะลา",NWT:"นราธิวาส",SKA:"สงขลา"};
+const STL={late:"เกินกำหนด",soon:"ใกล้ครบ",ok:"ปกติ",none:""};
+const $=i=>document.getElementById(i);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const p2=n=>n<10?"0"+n:""+n;
+const dk=d=>d?`${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`:"ไม่ระบุวันที่";
+const tm=d=>d?`${p2(d.getHours())}:${p2(d.getMinutes())}`:"";
+const dt=d=>d?dk(d)+" "+tm(d):"-";
+let view="job",recs=[],vis=[],BASE=Date.now(),lastT=null;
+let NOTES={};try{NOTES=JSON.parse(localStorage.getItem("tg_notes")||"{}")}catch(e){}
+const openRm=new Set();
+const K=x=>x.kind==="t"?x.job:x.job+"|"+x.assign+"|"+dk(x.date);
+const ntv=k=>NOTES[k]||{tick:false,rm:""};
+function setN(k,f,v){const n=NOTES[k]||(NOTES[k]={tick:false,rm:""});n[f]=v;if(!n.tick&&!n.rm)delete NOTES[k];try{localStorage.setItem("tg_notes",JSON.stringify(NOTES))}catch(e){}}
+const F={q:"",pri:"",st:"",pg:"",prov:"",as:"",sort:"end"};
+
+function st(x){if(!x.end)return"none";const m=(x.end-Date.now())/60000;return m<0?"late":m<=60?"soon":"ok"}
+function span(m){const a=Math.abs(m);return(a>=1440?Math.floor(a/1440)+" วัน ":"")+Math.floor(a%1440/60)+" ชม. "+Math.floor(a%60)+" นาที"}
+function remain(x){if(!x.end)return"";const m=(x.end-Date.now())/60000;return m<0?`<span class="late">เกินกำหนด ${span(m)}</span>`:`<span class="${st(x)==="soon"?"soon":"left"}">เหลือ ${span(m)}</span>`}
+function pct(x){if(!x.start||!x.end)return 0;return Math.max(0,Math.min(100,(Date.now()-x.start)/(x.end-x.start)*100))}
+
+function parseTickets(t){
+  return t.split(/(?=JB26-\d+)/).filter(b=>/^JB26-\d+/.test(b)).map(b=>{
+    const job=b.match(/JB26-\d+/)[0];
+    const lines=b.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const used=new Set([0]);
+    const pm=b.match(/\b(Critical|Major|Minor|None)\b/i);
+    const pri=pm?pm[1][0].toUpperCase()+pm[1].slice(1).toLowerCase():"None";
+    const sm=lines[0].match(/\b(Assigned|Held|Hold|Accepted|Departed|Depart|On-?site|Done|Leave|Created?|Pending|In Progress|Closed|Resolved)\b/i);
+    const status=sm?sm[1]:"";
+    const hm=lines[0].match(/(\d+(?:\.\d+)?)\s*(?:ชั่วโมง|ชม\.?|hours?|hrs?)/i);
+    const hrs=hm?parseFloat(hm[1]):null;
+    let t0=lines[0].replace(job,"").replace(/\[\s*\]/g,"").replace(new RegExp("\\b"+pri+"\\b","i"),"");
+    if(sm)t0=t0.replace(sm[0],"");
+    if(hm)t0=t0.replace(hm[0],"");
+    const title=t0.replace(/\|/g," ").replace(/\s+/g," ").replace(/^[\s:\-–]+|[\s:\-–]+$/g,"");
+    let assign="";
+    lines.forEach((l,i)=>{const m=l.match(/Assign(?:ed)?\s*To\s*[:：]?\s*(.+)/i);if(m&&!assign){assign=m[1].trim();used.add(i)}});
+    const fm=b.match(/Finish Before\s*[:：]?\s*(\d{1,2})-(\d{1,2})-(\d{4})\s+(\d{1,2}):(\d{2})/i);
+    let end=fm?new Date(+fm[3],fm[2]-1,+fm[1],+fm[4],+fm[5]):null;
+    let start=end?new Date(end.getTime()-SLA[pri]*3600000):null,derived=false;
+    if(!end&&hrs!=null){start=new Date(BASE-hrs*3600000);end=new Date(start.getTime()+SLA[pri]*3600000);derived=true}
+    lines.forEach((l,i)=>{if(/Finish Before/i.test(l))used.add(i)});
+    let recv="",sender="",phone="";
+    lines.forEach((l,i)=>{const m=l.match(/\bto\s+(.+?)\s+by\s+(.+?)(?:\s+(\+?\d[\d\-\s]{7,}\d))?(?=\s*(?:\[|$))/i);if(m&&!recv){recv=m[1].trim();sender=m[2].trim();phone=(m[3]||"").trim();used.add(i)}});
+    const coords=[...b.matchAll(/\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]/g)].map(m=>[m[1],m[2]]);
+    const site=(b.match(/\b(?:PTN|YLA|NWT|SKA)[A-Za-z0-9_\-]*/)||[""])[0];
+    const prov=site?PROV[site.slice(0,3)]||"":"";
+    let teams=[];
+    for(let i=lines.length-1;i>0;i--){const l=lines[i];if(!used.has(i)&&!/[\[\]:]/.test(l)&&l.includes(",")){teams=l.split(/[,،、]/).map(s=>s.trim()).filter(Boolean);used.add(i);break}}
+    const detail=lines.filter((l,i)=>!used.has(i)).join("\n");
+    const miss=[];if(!end)miss.push("Finish Before");if(!teams.length)miss.push("รายชื่อทีมช่าง");if(!assign)miss.push("Assign To");if(!coords.length)miss.push("พิกัด");
+    return{kind:"t",job,title,pri,status,hrs,derived,assign,recv,sender,phone,auto:/auto/i.test(sender),coords,site,prov,start,end,date:end,teams,detail,raw:b.trim(),miss,cf:[],sort:end?end.getTime():0};
+  });
+}
+function parseRoster(t){
+  const r=[];
+  t.split(/\r?\n/).forEach(l=>{
+    if(!l.trim())return;
+    const c=l.split(/\t|\s{2,}|,/).map(s=>s.trim()).filter(Boolean);
+    if(c.length<2)return;
+    const dm=l.match(/(\d{1,2})-([A-Za-z]{3})[A-Za-z]*-(\d{4})/);
+    const d=dm?new Date(+dm[3],MON[dm[2].toLowerCase()],+dm[1]):null;
+    const sh=(l.match(/\bST\d+\b/)||[""])[0];
+    const area=c.find(x=>/-3BB-|RC\d|[A-Z]{3}-\d/.test(x))||"";
+    const ty=(l.match(/\b3BB-\w+\b/)||[""])[0];
+    const prov=PROV[(area.match(/\b(PTN|YLA|NWT|SKA)\b/)||[])[1]]||"";
+    r.push({kind:"r",job:area||ty||"-",title:ty===area?"":ty,pri:"",status:"",hrs:null,derived:false,assign:c[0],recv:"",sender:"",phone:"",auto:false,coords:[],site:"",prov,start:null,end:null,date:d,teams:[c[0]],shift:sh,detail:"",raw:l,miss:[],cf:[],sort:(d?d.getTime():0)+(parseInt(sh.replace(/\D/g,""))||0)});
+  });
+  return r;
+}
+function conflicts(){
+  for(let i=0;i<recs.length;i++)for(let j=i+1;j<recs.length;j++){
+    const a=recs[i],b=recs[j];
+    if(!a.start||!b.start||!(a.start<b.end&&b.start<a.end))continue;
+    a.teams.filter(n=>b.teams.includes(n)).forEach(n=>{a.cf.push({team:n,job:b.job});b.cf.push({team:n,job:a.job})});
+  }
+}
+function oneLine(x){return[x.job,x.pri&&"["+x.pri+"]",x.title].filter(Boolean).join(" ")}
+function summary(x){
+  const L=[oneLine(x)+(ntv(K(x)).tick?" ✓ กำลังดำเนินการ":"")];
+  if(x.status)L.push("สถานะ: "+x.status+(x.hrs!=null?" | อายุงาน "+x.hrs+" ชม.":""));
+  if(x.assign)L.push("Assign To: "+x.assign);
+  if(x.teams.length)L.push("ทีม: "+x.teams.join(", "));
+  if(x.end)L.push("เวลา: "+dt(x.start)+" → "+dt(x.end));else if(x.date)L.push("วันที่: "+dk(x.date)+(x.shift?" กะ "+x.shift:""));
+  const loc=[x.site,x.prov].filter(Boolean).join(" · ");if(loc)L.push("ไซต์: "+loc);
+  if(x.recv||x.sender)L.push("to "+x.recv+" by "+x.sender+(x.phone?" "+x.phone:""));
+  x.coords.forEach((c,i)=>L.push("พิกัด"+(x.coords.length>1?" "+(i+1):"")+": https://www.google.com/maps?q="+c[0]+","+c[1]));
+  if(x.detail)L.push("รายละเอียด: "+x.detail.replace(/\n/g," / "));
+  if(ntv(K(x)).rm)L.push("Remark: "+ntv(K(x)).rm.replace(/\n/g," / "));
+  return L.join("\n");
+}
+function fullCard(x){
+  const rows=[],add=(k,v)=>{if(v)rows.push(`<dt>${k}</dt><dd>${v}</dd>`)};
+  add("Assign To",x.assign?`<b>${esc(x.assign)}</b>`:"");
+  add("ทีมช่าง",x.teams.map(n=>`<span class="chip">${esc(n)}</span>`).join(""));
+  add("ผู้รับ (to)",esc(x.recv));
+  add("ผู้ส่ง (by)",x.sender?esc(x.sender)+(x.auto?' <span class="tag auto">ระบบส่งอัตโนมัติ</span>':""):"");
+  add("เบอร์โทร",x.phone?`<a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:"");
+  add("ไซต์ / จังหวัด",esc([x.site,x.prov].filter(Boolean).join(" · ")));
+  add("วันที่",x.kind==="r"&&x.date?dk(x.date):"");
+  add("กะ",esc(x.shift||""));
+  add("เริ่ม (Create)",x.end?dt(x.start):"");
+  add("สถานะงาน",x.status?`<span class="tag st" style="margin:0">${esc(x.status)}</span>`:"");
+  add("อายุงาน",x.hrs!=null?x.hrs+" ชม.":"");
+  add(x.derived?"ครบกำหนด (คำนวณ)":"Finish Before",x.end?dt(x.end):"");
+  add("SLA",x.end?(SLA[x.pri]>=24?SLA[x.pri]/24+" วัน":SLA[x.pri]+" ชม."):"");
+  add("สถานะเวลา",remain(x));
+  add("พิกัด",x.coords.map((c,i)=>`<a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${c[0]},${c[1]}">แผนที่ ${i+1} (${c[0]}, ${c[1]})</a>`).join("<br>"));
+  add("รายละเอียด",esc(x.detail).replace(/\n/g,"<br>"));
+  const warns=[];
+  if(x.cf.length)warns.push("⚠️ ทีมซ้อนงาน: "+[...new Set(x.cf.map(c=>c.team+" ↔ "+c.job))].map(esc).join(", "));
+  if(x.miss.length)warns.push("ℹ️ ไม่พบ: "+x.miss.join(", "));
+  return `<div class="g jc ${x.pri}${ntv(K(x)).tick?" prog":""}"><div class="jh"><b>${esc(x.job)}${x.pri?`<span class="tag ${x.pri}">${x.pri}</span>`:""}${x.status?`<span class="tag st">${esc(x.status)}</span>`:""}</b><span>${esc(x.title)}</span><button class="mini tk${ntv(K(x)).tick?" on":""}" data-tk="${esc(K(x))}">✓ กำลังดำเนินการ</button></div>${x.end?`<div class="pb"><i class="${st(x)}" style="width:${pct(x)}%"></i></div>`:""}<dl class="f">${rows.join("")}</dl>${warns.map(w=>`<div class="warn">${w}</div>`).join("")}<div class="rmc"><textarea rows="2" data-rmin="${esc(K(x))}" placeholder="📝 Remark รายละเอียด (เช่น ติดต่อลูกค้าแล้ว รออะไหล่)">${esc(ntv(K(x)).rm)}</textarea></div><div class="ft"><button data-cp="${recs.indexOf(x)}">📋 คัดลอกงานนี้</button></div><details class="raw"><summary>ข้อความต้นฉบับ</summary><pre>${esc(x.raw)}</pre></details></div>`;
+}
+function row(x,sub){
+  const s=st(x),k=K(x),n=ntv(k),op=openRm.has(k);
+  const stt=x.status?x.status+(x.hrs!=null?" | "+x.hrs+" ชม.":""):"";
+  return `<div class="it${n.tick?" prog":""}"><div class="ir"><div class="ic"><b>${esc(x.job)}</b>${x.pri?`<span class="tag ${x.pri}">${x.pri}</span>`:""}${s==="late"||s==="soon"?` <span class="${s}">● ${STL[s]}</span>`:""}${x.cf.length?" ⚠️":""}<small>${esc([stt,x.title,sub].filter(Boolean).join(" · "))}</small></div><div class="ia"><button class="mini" data-rm="${esc(k)}" title="Remark รายละเอียด">📝</button><button class="mini tk${n.tick?" on":""}" data-tk="${esc(k)}" title="กำลังดำเนินการ">✓</button></div></div>${op?`<input type="text" data-rmin="${esc(k)}" value="${esc(n.rm)}" placeholder="Remark รายละเอียด...">`:n.rm?`<div class="rmt">📝 ${esc(n.rm)}</div>`:""}</div>`;
+}
+function group(keys){
+  const m=new Map();
+  vis.forEach(x=>keys(x).forEach(k=>{if(!m.has(k))m.set(k,[]);m.get(k).push(x)}));
+  return[...m];
+}
+function render(){
+  const out=$("out");
+  $("shown").textContent=recs.length?`แสดง ${vis.length} จาก ${recs.length} รายการ`:"";
+  if(!recs.length){out.innerHTML='<div class="empty" style="grid-column:1/-1">ยังไม่มีข้อมูล — วางข้อความด้านบน หรือกดปุ่มตัวอย่าง</div>';return}
+  if(!vis.length){out.innerHTML='<div class="empty" style="grid-column:1/-1">ไม่พบรายการตามตัวกรอง</div>';return}
+  if(view==="job"){out.innerHTML=vis.map(fullCard).join("");return}
+  let g,ico,sub,extra=()=>"";
+  if(view==="assign"){g=group(x=>[x.assign||"(ไม่ระบุ Assign To)"]).sort((a,b)=>a[0].localeCompare(b[0],"th"));ico="🧑‍💼 ";sub=x=>[x.end?"ครบ "+dt(x.end):dk(x.date),x.teams.join(", ")].join(" · ")}
+  else if(view==="team"){g=group(x=>x.teams.length?x.teams:["(ยังไม่ระบุทีม)"]).sort((a,b)=>a[0].localeCompare(b[0],"th"));ico="👥 ";sub=x=>[x.end?"ครบ "+dt(x.end):dk(x.date),x.assign&&"Assign: "+x.assign].filter(Boolean).join(" · ");extra=(k,it)=>it.some(x=>x.cf.some(c=>c.team===k))?' <span class="tag Major">⚠️ ซ้อนงาน</span>':""}
+  else{g=group(x=>[dk(x.date)]).sort((a,b)=>a[1][0].sort-b[1][0].sort);g.forEach(e=>e[1].sort((a,b)=>a.sort-b.sort));ico="📅 ";sub=x=>[x.end?tm(x.start)+" – "+tm(x.end):x.shift,x.assign&&"Assign: "+x.assign,x.teams.join(", ")].filter(Boolean).join(" · ")}
+  out.innerHTML=g.map(([k,items])=>`<div class="g"><div class="gh"><span>${ico}${esc(k)}${extra(k,items)}</span><span class="cnt">${items.length}</span></div>${items.map(x=>row(x,sub(x))).join("")}</div>`).join("");
+}
+function applyFilter(){
+  const q=F.q.toLowerCase();
+  vis=recs.filter(x=>{
+    if(F.pri&&x.pri!==F.pri)return false;
+    if(F.st&&st(x)!==F.st)return false;
+    if(F.prov&&x.prov!==F.prov)return false;
+    if(F.as&&x.assign!==F.as)return false;
+    if(F.pg==="on"&&!ntv(K(x)).tick)return false;
+    if(F.pg==="off"&&ntv(K(x)).tick)return false;
+    if(q&&![x.job,x.title,x.assign,x.teams.join(" "),x.recv,x.sender,x.site,x.prov,x.detail].join(" ").toLowerCase().includes(q))return false;
+    return true;
+  });
+  vis.sort(F.sort==="pri"?(a,b)=>RANK[a.pri]-RANK[b.pri]||a.sort-b.sort:F.sort==="job"?(a,b)=>a.job.localeCompare(b.job):(a,b)=>a.sort-b.sort);
+  const n=k=>vis.filter(x=>st(x)===k).length;
+  const cf=vis.filter(x=>x.cf.length).length;
+  $("stats").innerHTML=[["งาน",vis.length,"","",""],["Assign To",new Set(vis.map(x=>x.assign).filter(Boolean)).size,"","",""],["ทีม/คน",new Set(vis.flatMap(x=>x.teams)).size,"","",""],["เกินกำหนด",n("late"),"r","st","late"],["ใกล้ครบ ≤1 ชม.",n("soon"),"y","st","soon"],["ทีมซ้อนงาน",cf,"y","",""],["กำลังดำเนินการ ✓",vis.filter(x=>ntv(K(x)).tick).length,"k","pg","on"]].map(a=>`<div class="stat ${a[2]}" ${a[3]==="st"?`data-sf="${a[4]}"`:a[3]==="pg"?`data-pf="on"`:""}><b>${a[1]}</b><span>${a[0]}</span></div>`).join("");
+  render();
+}
+function fillSel(id,vals,label){
+  const s=$(id),cur=s.value;
+  s.innerHTML=`<option value="">${label}</option>`+[...new Set(vals.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"th")).map(v=>`<option>${esc(v)}</option>`).join("");
+  s.value=[...s.options].some(o=>o.value===cur)?cur:"";
+  return s.value;
+}
+function run(){
+  const t=$("in").value,tk=/JB26-\d+/.test(t);
+  if(t!==lastT){if(lastT!==null)BASE=Date.now();lastT=t}
+  try{localStorage.setItem("tg_in",t);localStorage.setItem("tg_ts",String(BASE))}catch(e){}
+  recs=tk?parseTickets(t):parseRoster(t);
+  conflicts();
+  $("mode").textContent=recs.length?"· ตรวจพบ "+(tk?"ตั๋วงาน":"ตารางเวร")+" "+recs.length+" รายการ":"";
+  F.prov=fillSel("fprov",recs.map(x=>x.prov),"ทุกจังหวัด");
+  F.as=fillSel("fas",recs.map(x=>x.assign),"ทุก Assign To");
+  applyFilter();
+}
+function copy(text,btn){
+  const ok=()=>{if(!btn)return;const o=btn.textContent;btn.textContent="คัดลอกแล้ว ✓";setTimeout(()=>btn.textContent=o,1400)};
+  const fb=()=>{const a=document.createElement("textarea");a.value=text;document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){}a.remove()};
+  try{navigator.clipboard.writeText(text).then(ok,fb)}catch(e){fb()}
+}
+let tmr;
+$("in").addEventListener("input",()=>{clearTimeout(tmr);tmr=setTimeout(run,150)});
+$("q").addEventListener("input",e=>{F.q=e.target.value;applyFilter()});
+[["fpri","pri"],["fst","st"],["fpg","pg"],["fprov","prov"],["fas","as"],["fsort","sort"]].forEach(([id,k])=>$(id).addEventListener("change",e=>{F[k]=e.target.value;applyFilter()}));
+document.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll("[data-v]").forEach(x=>x.classList.toggle("on",x===b));render()});
+$("stats").addEventListener("click",e=>{const s=e.target.closest("[data-sf],[data-pf]");if(!s)return;if(s.dataset.pf){F.pg=F.pg==="on"?"":"on";$("fpg").value=F.pg}else{F.st=F.st===s.dataset.sf?"":s.dataset.sf;$("fst").value=F.st}applyFilter()});
+$("out").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cp]");if(b){copy(summary(recs[+b.dataset.cp]),b);return}
+  const t=e.target.closest("[data-tk]");if(t){const k=t.dataset.tk;setN(k,"tick",!ntv(k).tick);applyFilter();return}
+  const r=e.target.closest("[data-rm]");
+  if(r){const k=r.dataset.rm,was=openRm.has(k);was?openRm.delete(k):openRm.add(k);render();if(!was){const i=[...document.querySelectorAll("[data-rmin]")].find(z=>z.dataset.rmin===k);if(i)i.focus()}}
+});
+$("out").addEventListener("input",e=>{const i=e.target.closest("[data-rmin]");if(i)setN(i.dataset.rmin,"rm",i.value)});
+$("rst").onclick=()=>{Object.assign(F,{q:"",pri:"",st:"",pg:"",prov:"",as:"",sort:"end"});["q","fpri","fst","fpg","fprov","fas","fsort"].forEach(i=>$(i).value=i==="fsort"?"end":"");applyFilter()};
+$("clr").onclick=()=>{$("in").value="";run()};
+$("cpall").onclick=e=>{if(vis.length)copy(vis.map(summary).join("\n\n"),e.target)};
+$("cptab").onclick=e=>{
+  if(!vis.length)return;
+  const h=["JB","ระดับ","ชื่อเรื่อง","Assign To","ทีมช่าง","ผู้รับ","ผู้ส่ง","เบอร์โทร","ไซต์","จังหวัด","เริ่ม","Finish Before","พิกัด","สถานะงาน","อายุงาน (ชม.)","กำลังดำเนินการ","Remark"];
+  const c=v=>String(v==null?"":v).replace(/[\t\r\n]+/g," ");
+  copy([h.join("\t")].concat(vis.map(x=>[x.job,x.pri,x.title,x.assign,x.teams.join(", "),x.recv,x.sender,x.phone,x.site,x.prov,x.end?dt(x.start):x.date?dk(x.date):"",x.end?dt(x.end):x.shift||"",x.coords.map(k=>k.join(",")).join(" ; "),x.status,x.hrs==null?"":x.hrs,ntv(K(x)).tick?"✓":"",ntv(K(x)).rm].map(c).join("\t"))).join("\n"),e.target);
+};
+$("ex1").onclick=()=>{$("in").value="JB26-0012345 Service Outage Critical\nAssign To: Nianwa Kami\nFinish Before 07-11-2026 18:30:00\nto RNOC by Auto 0812345678 [6.8712,101.2503] PTN-OLT-01\nลูกค้าเน็ตหลุดทั้งสาย ตรวจสอบสายหลักก่อน\nPTN01, PTN02, PTN03\n\nJB26-0012350 Link Down Major\nAssign To: Nianwa Kami\nFinish Before 07-11-2026 22:00:00\nto RNOC by Somchai 0898765432 [6.5400,101.2800] YLA-OLT-05\nYLA01, PTN02, YLA03\n\nJB26-0012361 Low Power Minor\nAssign To: Somsak Dee\nFinish Before 09-11-2026 12:00:00\nto RNOC by Auto 0000000000 [7.0100,100.4700] SKA-OLT-02\nSKA02, NWT01, NWT02";run()};
+$("ex2").onclick=()=>{$("in").value="สมชาย ใจดี\tsomchai.j\t4-Nov-2026\t3BB-FE\tST03\tLB-3BB-RC8-YLA-05\nอนันต์ มั่นคง\tanan.m\t4-Nov-2026\t3BB-FE\tST04\tLB-3BB-RC8-PTN-02\nสมชาย ใจดี\tsomchai.j\t5-Nov-2026\t3BB-FE\tST03\tLB-3BB-RC8-YLA-05";run()};
+try{const s=localStorage.getItem("tg_in"),ts=+localStorage.getItem("tg_ts");if(s){$("in").value=s;if(ts)BASE=ts}}catch(e){}
+run();
+setInterval(()=>{if(recs.length)applyFilter()},60000);
+</script>
+</body>
+</html>
